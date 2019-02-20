@@ -6,9 +6,9 @@
 # El alfabeto de entrada con el que vamos a estar trabajando.
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ., "
 # La cadena que vamos a encriptar.
-clearString = str(raw_input("Cadena a encriptar: ")).upper()
+clearString = str(input("Cadena a encriptar: ")).upper()
 # La llave que vamos a utilizar.
-key = int(raw_input("Digita la llave: "))
+key = int(input("Digita la llave: "))
 
 # Funcion que cifra.
 def enc(key, clearString):
@@ -44,12 +44,12 @@ def dec(key, encriptedString):
 		clearString = clearString+str(alphabet[mod])
 
 	# Regresamos la cadena descencriptada.
- 	return clearString
+	return clearString
 
 # Imprimimos el resultado de la funcion enc.
-print enc(key, clearString)
+print(enc(key, clearString))
 # Imprimimos el resultado de la funcion dec.
-print dec(key, enc(key, clearString))
+print(dec(key, enc(key, clearString)))
 
 # Codigo para leer los bytes de un archivo.
 with open("calamardo_pastel.jpg", "rb") as f:
