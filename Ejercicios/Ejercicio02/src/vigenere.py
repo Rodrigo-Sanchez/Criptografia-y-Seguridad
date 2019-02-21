@@ -21,7 +21,7 @@ def frequency(text):
         alphabet = "".join([x for x in alphabet if x is not char])
         # Imprimimos el porcentaje que aparece cada letra.
         # Hacemos un cast de average de float a string.
-        print('El porcentaje que aparece la '+char+' es '+repr(average*100)+'%')
+        print('El porcentaje que aparece la '+char+' es: '+repr(average*100)+'%')
     
     # Convertimos la cadena a una lista.
     missingLettersList = list(alphabet)
@@ -48,7 +48,7 @@ def I(list):
     I = 0
     for i in list:
         I += i**2
-    # print("El valor de I es: "+repr(I))
+    print("El valor de I es: "+repr(I))
     return I
 
 # Abrimos el archivo especificado en la terminal con permisos de lectura.
@@ -70,18 +70,16 @@ with open(sys.argv[1], 'r') as f:
 # frequency(block(5, cypherClean))
 
 for n in range(1, len(cypherClean)):
-    if(I(frequency(block(n, cypherClean))) >= 0.0741):
-        # Obtiene las frecuenciasde  las letras en el texto.
-        bloc = block(n, cypherClean)
+    bloc = block(n, cypherClean)
+    if(I(frequency(bloc)) >= 0.0741):
+        # Obtiene las frecuencias de las letras en el texto.
         q = frequency(bloc)
         # print("Las frecuencias qi en el texto B son: " + repr(q))
         break
 
-p = {0:0.1253,1:0.0142,2:0.0468,3:0.0586,4:0.1386,5:0.0069,6:0.0101,7:0.007,8:0.0625,9:0.0044,10:0.0002,11:0.0497,12:0.0315,13:0.0671,14:0.0031,15:0.0868,16:0.0251,17:0.0088,18:0.0687,19:0.0798,20:0.0463,21:0.0393,22:0.009,23:0.0001,24:0.0022,25:0.009,26:0.0052}
-
-# p = {0:13,1:11.1,2:9.7,3:8.2,4:8,5:7.7,6:6.9,7:5.3,8:5.2,
-#     9:4.5,10:3.6,11:3.6,12:3,13:2.9,14:1.4,15:1.3,16:1,17:0.8,
-#     18:0.7,19:0.6,20:0.6,21:0.3,22:0.3,23:0.2,24:0.1,25:0,26:0}
+p = [0.1253,0.0142,0.0468,0.0586,0.1386,0.0069,0.0101,0.007,0.0625,
+    0.0044,0.0002,0.0497,0.0315,0.0671,0.0031,0.0868,0.0251,0.0088,
+    0.0687,0.0798,0.0463,0.0393,0.009,0.0001,0.0022,0.009,0.0052]
 
 for k in range(27):
     Ik = 0
@@ -90,7 +88,6 @@ for k in range(27):
         # print("q " + repr(i+k) + " " + repr(q[(i+k)%27]))
         # print("p*q " +repr(p[i] * q[(i+k)%27]))
         Ik += (p[i] * q[(i+k)%27])
-    # Ik = Ik%27
     print("Ik: " + repr(Ik))
     if(Ik >= 0.0741):
         shift = k
@@ -99,7 +96,7 @@ for k in range(27):
 
 print("El valor del desplazamiento k es: " + repr(shift))
 
-alph = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
+alph = "ABCDEFGHIJKLM0NÑOPQRSTUVWXYZ"
 
 # Funcion que descifra.
 def dec(key, encriptedString):
@@ -119,9 +116,8 @@ def dec(key, encriptedString):
 	# Regresamos la cadena descencriptada.
 	return clearString
 
-# print(shift)
-# print(bloc)
-# print("--------------")
-print(dec(shift, bloc))
+print("El valor que nos dará el desplazamiento k para descifrar el bloque es: "+repr(shift))
+print(dec(shift, bloc)[:49])
+# print(dec(shift, bloc))
 # print(dec(shift, cypherClean))
 # print(dec(shift, cypher))
