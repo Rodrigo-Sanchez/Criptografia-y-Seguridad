@@ -21,7 +21,7 @@ def frequency(text):
         alphabet = "".join([x for x in alphabet if x is not char])
         # Imprimimos el porcentaje que aparece cada letra.
         # Hacemos un cast de average de float a string.
-        print('El porcentaje que aparece la '+char+' es '+repr(average*100)+'%')
+        print('El porcentaje que aparece la '+char+' es: '+repr(average*100)+'%')
     
     # Convertimos la cadena a una lista.
     missingLettersList = list(alphabet)
