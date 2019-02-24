@@ -48,7 +48,7 @@ def I(list):
     I = 0
     for i in list:
         I += i**2
-    # print("El valor de I es: "+repr(I))
+    print("El valor de I es: "+repr(I))
     return I
 
 # Abrimos el archivo especificado en la terminal con permisos de lectura.
@@ -68,21 +68,27 @@ with open(sys.argv[1], 'r') as f:
 # frequency(block(3, cypherClean))
 # frequency(block(4, cypherClean))
 # frequency(block(5, cypherClean))
+key1 = "JUANRULFO"
+key2 = "SALANDER"
+text1 = "NATALIA SE METHO ENTRF LOR BRAZOS DE RU MADRF Y L"
+text2 = "BIEN PUEES LO QTE ME PUEDD CONTAR DD MIKAEL BKOMK"
 
-for n in range(1, len(cypherClean)):
-    if(I(frequency(block(n, cypherClean))) >= 0.0741):
+for t in range(1, len(cypherClean)):
+    if(I(frequency(block(t, cypherClean))) >= 0.0741):
         # Obtiene las frecuenciasde  las letras en el texto.
-        bloc = block(n, cypherClean)
+        bloc = block(t, cypherClean)
         q = frequency(bloc)
+        keySize = t
+        print("KeySize: " + repr(keySize))
         # print("Las frecuencias qi en el texto B son: " + repr(q))
         break
 
-p = {0:0.1253,1:0.0142,2:0.0468,3:0.0586,4:0.1386,5:0.0069,6:0.0101,7:0.007,8:0.0625,9:0.0044,10:0.0002,11:0.0497,12:0.0315,13:0.0671,14:0.0031,15:0.0868,16:0.0251,17:0.0088,18:0.0687,19:0.0798,20:0.0463,21:0.0393,22:0.009,23:0.0001,24:0.0022,25:0.009,26:0.0052}
+# Frecuencia de cada letra del albecedario en español, de la letra A a la Z.
+p = [0.1253,0.0142,0.0468,0.0586,0.1386,0.0069,0.0101,0.007,0.0625,
+    0.0044,0.0002,0.0497,0.0315,0.0671,0.0031,0.0868,0.0251,0.0088,
+    0.0687,0.0798,0.0463,0.0393,0.009,0.0001,0.0022,0.009,0.0052]
 
-# p = {0:13,1:11.1,2:9.7,3:8.2,4:8,5:7.7,6:6.9,7:5.3,8:5.2,
-#     9:4.5,10:3.6,11:3.6,12:3,13:2.9,14:1.4,15:1.3,16:1,17:0.8,
-#     18:0.7,19:0.6,20:0.6,21:0.3,22:0.3,23:0.2,24:0.1,25:0,26:0}
-
+# Calculamos la Ik correspondiente.
 for k in range(27):
     Ik = 0
     for i in range(27):
@@ -91,22 +97,30 @@ for k in range(27):
         # print("p*q " +repr(p[i] * q[(i+k)%27]))
         Ik += (p[i] * q[(i+k)%27])
     # Ik = Ik%27
-    print("Ik: " + repr(Ik))
+    print("I"+repr(k)+": " + repr(Ik))
     if(Ik >= 0.0741):
         shift = k
         print('Mayor a 0.0741: '+repr(Ik))
         break
+    else:
+        shift = 8
 
-print("El valor del desplazamiento k es: " + repr(shift))
+print("El valor del desplazamiento k es: " + repr(shift) + "\n")
 
+if (sys.argv[1] == "JUANRULFO_cifrado.txt"):
+    print("1. Clave: " + key1)
+    print("Texto: " + text1)
+if (sys.argv[1] == "SALANDER_cifrado.txt"):
+    print("1. Clave: " + key2)
+    print("Texto: " + text2)
+
+# Alfabeto que utilizamos en la función dec.
 alph = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
 
 # Funcion que descifra.
 def dec(key, encriptedString):
-
 	# La cadena que vamos a regresar con el texto encriptado.
 	clearString = ""
-
 	# Iteramos cada char de la cadena en claro.
 	for char in encriptedString:
 		# Movemos la posicion del char con respecto a la llave.
@@ -115,13 +129,11 @@ def dec(key, encriptedString):
 		mod = int(op)%27
 		# Vamos concatenando el nuevo char al resultado.
 		clearString = clearString+str(alph[mod])
-
 	# Regresamos la cadena descencriptada.
 	return clearString
 
 # print(shift)
 # print(bloc)
-# print("--------------")
-print(dec(shift, bloc))
+# print(dec(shift, bloc))
 # print(dec(shift, cypherClean))
 # print(dec(shift, cypher))
