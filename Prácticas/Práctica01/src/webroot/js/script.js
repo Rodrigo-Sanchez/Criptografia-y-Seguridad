@@ -13,7 +13,32 @@ $(document).ready(function () {
     // Enviamos el valor del textarea si cliqueamos el botón de enviar.
     $('#button').click(function () {
         if (message.value) {
-            websocket.send(message.value);
+            alert($("#message").val());
+
+            // websocket.send(JSON.stringify({
+            //     "tipo": "msj_chat",
+            //     "destino": "Jorge",
+            //     "msj": "Hola, criptoamigo."
+            // }));
+
+            // websocket.send(message.value);
+        }
+    });
+
+    $('#register').click(function () {
+        if (message.value) {
+            websocket.send(JSON.stringify({
+                "tipo": "registro",
+                "nombre": "Rodd"
+            }));
+        }
+    });
+
+    $('#users').click(function () {
+        if (message.value) {
+            websocket.send(JSON.stringify({
+                "tipo": "usuarios",
+            }));
         }
     });
 
