@@ -16,22 +16,23 @@ $(document).ready(function () {
         message = $('#message').val();
         // Solamente funciona si el campo no es vacío.
         if (message) {
-            // Agregamos al árbol DOM el contenido del mensaje.
-            $(".msg_card_body").append('<div class="d-flex justify-content-end mb-4">' +
-                                            '<div class="msg_cotainer_send">' +
-                                                message +
-                                                '<span class="msg_time_send">' +
-                                                    JSClock() +
-                                                '</span>' +
-                                            '</div>' +
-                                            '<div class="img_cont_msg">' +
-                                                '<img src="webroot/img/man04.svg" class="rounded-circle user_img_msg">' +
-                                            '</div>' +
-                                        '</div>');
+            // Agregamos al chat el contenido del mensaje.
+            $(".msg_card_body").append(
+                '<div class="d-flex justify-content-end mb-4">' +
+                    '<div class="msg_cotainer_send">' +
+                        message +
+                        '<span class="msg_time_send">' +
+                            JSClock() +
+                        '</span>' +
+                    '</div>' +
+                    '<div class="img_cont_msg">' +
+                        '<img src="webroot/img/man02.svg" class="rounded-circle user_img_msg">' +
+                    '</div>' +
+                '</div>');
             // Creamos el objeto con el tipo de petición al servidor.
             let obj = {"tipo" : "msj_chat"};
             // Agregamos el nombre de usuario destinatario al objeto.
-            obj["destino"] = "Jorge";
+            obj["destino"] = $(this).attr('data-user');
             // Agregamos el mensaje al objeto.
             obj["msj"] = message;
             // Convierte un objeto a una cadena JSON.
@@ -66,24 +67,72 @@ $(document).ready(function () {
         }));
     });
 
+    // Al cliquear en un usuario conectado nos despliega su chat.
+    $(document).on('click', '.contacts li', function () {
+        let username = $(this).find(".username_info").text();
+        $(this).parent().children().removeClass('active');
+        $(this).addClass('active');
+        $('#conversation').empty();
+        $('#conversation').append(
+            '<span>' +
+                'Conversación con ' + username + "." +
+            '</span>');
+        $('#button').attr('data-user', username);
+    });
+
     // Si recibimos una respuesta del servidor mostramos el contenido.
     websocket.onmessage = function (evt) {
         // Convierte en objeto la cadena JSON recibida.
         var obj = JSON.parse(evt.data);
+        // Imprime cada respuesta del servidor en consola.
         console.log(obj);
-        switch(obj.tipo) {
+        switch (obj.tipo) {
             case "msj_nuevo":
-                $(".msg_card_body").append('<div class="d-flex justify-content-start mb-4">' +
-                                                '<div class="img_cont_msg">' +
-                                                    '<img src="webroot/img/man01.svg" class="rounded-circle user_img_msg">' +
-                                                '</div>' +
-                                                '<div class="msg_cotainer">' +
-                                                    obj.msj +
-                                                    '<span class="msg_time">' +
-                                                        obj.hora +
-                                                    '</span>' +
-                                                '</div>' +
-                                            '</div>');
+                $(".msg_card_body").append(
+                    '<div class="d-flex justify-content-start mb-4">' +
+                        '<div class="img_cont_msg">' +
+                            '<img src="webroot/img/man01.svg" class="rounded-circle user_img_msg">' +
+                        '</div>' +
+                        '<div class="msg_cotainer">' +
+                            obj.msj +
+                            '<span class="msg_time">' +
+                                obj.hora +
+                            '</span>' +
+                        '</div>' +
+                    '</div>');
+                break;
+            default:
+                break;
+        }
+        switch (obj.peticion) {
+            case "usuarios":
+                if(obj.ok) {
+                    // Como regresa una cadena, quitamos el primer elemento [ y el
+                    // útimo elemento ], las comillas simples y separa por comas.
+                    userArray = obj.detalles.substr(1).slice(0, -1).replace(/'/gm, '').split(',');
+                    // Primero limpiamos la sección anterior de usuarios conectados.
+                    $(".contacts").empty();
+                    // Para cada usuario imprimimos su respectivo cuadro de conectado.
+                    for (let user of userArray) {
+                        $(".contacts").append(
+                            '<li>' +
+                                '<div class="d-flex bd-highlight">' +
+                                    '<div class="img_cont">' +
+                                        '<img src="webroot/img/man01.svg" class="rounded-circle user_img">' +
+                                        '<span class="online_icon"></span>' +
+                                    '</div>' +
+                                    '<div class="user_info">' +
+                                        '<span class="username_info">' + 
+                                            user +
+                                        '</span>' +
+                                        '<p>' +
+                                            'Está en línea ahora.' +
+                                        '</p>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</li>');
+                    }
+                }
                 break;
             default:
                 break;
@@ -100,7 +149,7 @@ function JSClock() {
     let hour = now.getHours();
     let minutes = now.getMinutes();
     let seconds = now.getSeconds();
-    switch(month) {
+    switch (month) {
         case 0:
             month = "Ene";
             break;
