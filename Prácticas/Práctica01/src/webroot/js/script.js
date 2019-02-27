@@ -11,8 +11,6 @@ $(document).ready(function () {
     // Enviamos el valor del textarea si cliqueamos el botón de enviar.
     $('#button').click(function () {
         // Obtenemos el campo del nombre de usuario del modal.
-        username = $('#username').val();
-        // Obtenemos el campo del nombre de usuario del modal.
         message = $('#message').val();
         // Solamente funciona si el campo no es vacío.
         if (message) {
@@ -56,6 +54,8 @@ $(document).ready(function () {
             let json = JSON.stringify(obj);
             // Se envía la cadena al websocket.
             websocket.send(json);
+            // Ocultamos el modal.
+            $('#exampleModal').modal('hide');
         }
     });
 
@@ -65,18 +65,28 @@ $(document).ready(function () {
         websocket.send(JSON.stringify({
             "tipo": "usuarios"
         }));
+        // Ocultamos el desborde de acciones.
+        $(this).parent().parent().toggle();
     });
 
     // Al cliquear en un usuario conectado nos despliega su chat.
     $(document).on('click', '.contacts li', function () {
-        let username = $(this).find(".username_info").text();
+        // Obtenemos el nombre de usuario y le quitamos los espacios.
+        let username = $(this).find(".username_info").text().replace(/\s/g, '');
+        // A todos los chats le quitamos la clase active.
         $(this).parent().children().removeClass('active');
+        // Al actual le agregamos la clase active.
         $(this).addClass('active');
+        // Limpiamos los mensajes enviados anteriormente.
+        $('#msg_card_body').empty();
+        // Limpiamos el banner del nombre del chat abierto.
         $('#conversation').empty();
+        // Agregamos el nombre del usuario al banner.
         $('#conversation').append(
             '<span>' +
                 'Conversación con ' + username + "." +
             '</span>');
+        // Le agregamos un atributo especial al botón.
         $('#button').attr('data-user', username);
     });
 
@@ -150,45 +160,22 @@ function JSClock() {
     let minutes = now.getMinutes();
     let seconds = now.getSeconds();
     switch (month) {
-        case 0:
-            month = "Ene";
-            break;
-        case 1:
-            month = "Feb";
-            break;
-        case 2:
-            month = "Mar";
-            break;
-        case 3:
-            month = "Abr";
-            break;
-        case 4:
-            month = "May";
-            break;
-        case 5:
-            month = "Jun";
-            break;
-        case 6:
-            month = "Jul";
-            break;
-        case 7:
-            month = "Ago";
-            break;
-        case 8:
-            month = "Sep";
-            break;
-        case 9:
-            month = "Oct";
-            break;
-        case 10:
-            month = "Nov";
-            break;
-        case 11:
-            month = "Dic";
-            break;
+        case 0: month = "Ene"; break;
+        case 1: month = "Feb"; break;
+        case 2: month = "Mar"; break;
+        case 3: month = "Abr"; break;
+        case 4: month = "May"; break;
+        case 5: month = "Jun"; break;
+        case 6: month = "Jul"; break;
+        case 7: month = "Ago"; break;
+        case 8: month = "Sep"; break;
+        case 9: month = "Oct"; break;
+        case 10: month = "Nov"; break;
+        case 11: month = "Dic"; break;
     }
     let time = day + " " + month + " " + year + " ";
-    time += ((hour > 12) ? ((hour - 12 == 0) ? hour = 12 : (hour - 12)) : ((hour == 0) ? hour = 12 : hour));
+    time += (hour > 12) ? ((hour - 12 == 0) ? hour = 12 : (hour - 12)) 
+                        : ((hour == 0) ? hour = 12 : hour);
     time += ((minutes < 10) ? ":0" : ":") + minutes;
     time += ((seconds < 10) ? ":0" : ":") + seconds;
     return time;
