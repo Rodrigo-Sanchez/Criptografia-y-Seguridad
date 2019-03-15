@@ -27,3 +27,16 @@ function RC4(key, str) {
     }
     return res;
 }
+
+console.log(RC4("hola", "AAAAAAAAAAAA"))
+
+/**
+ * Función que obtiene un número criptográficamente seguro en el rango [0,1).
+ * @returns number 0 o 1 dependiendo si el resultado es mayor/menor que 0.5
+ */
+function cryptoRandom() {
+    return (window.crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000) > 0.5 ? 1 : 0;
+}
+
+// Vector de Inicialización de 5 bytes para cada mensaje cifrado.
+let IV = Array.from(Array(5), () => cryptoRandom());
