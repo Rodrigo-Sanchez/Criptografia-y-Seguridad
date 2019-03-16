@@ -59,6 +59,19 @@ $(document).ready(function () {
         }
     });
 
+    // Acción al cliquear "Registar usuario".
+    $('#sendKey').click(function () {
+        // Obtenemos el campo de la llave del usuario del modal.
+        keyValue = $('#keyValue').val();
+        // Solamente funciona si el campo no es vacío.
+        if(keyValue) {
+            // Definimos una variable global para la llave introducida.
+            window.key = keyValue;
+            // Ocultamos el modal.
+            $('#keyModal').modal('hide');
+        }
+    });
+
     // Acción al cliquear "Mostrar usuarios conectados".
     $('#users').click(function () {
         // Mandamos un JSON con el tipo de petición para obtener los usuarios.

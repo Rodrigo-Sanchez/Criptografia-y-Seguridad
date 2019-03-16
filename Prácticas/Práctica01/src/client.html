@@ -24,7 +24,7 @@
                             <div class="input-group">
                                 <input type="text" placeholder="Búsqueda..." name="" class="form-control search">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
+                                    <span class="input-group-text search_btn"><i class="fa fa-search"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -49,21 +49,24 @@
                                 </div>
                                 <div class="video_cam">
                                     <span>
-                                        <i class="fas fa-grin-stars"></i>
+                                        <i class="fa fa-grin-stars"></i>
                                     </span>
                                 </div>
                             </div>
                             <span id="action_menu_btn">
-                                <i class="fas fa-ellipsis-v"></i>
+                                <i class="fa fa-ellipsis-v"></i>
                             </span>
                             <div class="action_menu">
                                 <ul>
                                     <!-- Button trigger modal -->
-                                    <li data-toggle="modal" data-target="#exampleModal">
-                                        <i class="fas fa-user-circle"></i> Registrar usuario
+                                    <li data-toggle="modal" data-target="#usersModal">
+                                        <i class="fa fa-user-circle"></i> Registrar nuevo usuario
                                     </li>
                                     <li id="users">
-                                        <i class="fas fa-users"></i> Mostrar usuarios conectados
+                                        <i class="fa fa-users"></i> Mostrar usuarios conectados
+                                    </li>
+                                    <li data-toggle="modal" data-target="#keyModal">
+                                        <i class="fa fa-key"></i> Introducir llave para cifrar mensajes
                                     </li>
                                 </ul>
                             </div>
@@ -75,7 +78,7 @@
                                 <textarea id="message" class="form-control type_msg" placeholder="Escribe tu mensaje..."></textarea>
                                 <div class="input-group-append">
                                     <span id="button" class="input-group-text send_btn">
-                                        <i class="fas fa-location-arrow"></i>
+                                        <i class="fa fa-location-arrow"></i>
                                     </span>
                                 </div>
                             </div>
@@ -85,11 +88,11 @@
             </div>
         </div>
         <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="usersModal" tabindex="-1" role="dialog" aria-labelledby="usersModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Registrar nuevo usuario</h5>
+                        <h5 class="modal-title" id="usersModalLabel">Registrar nuevo usuario</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         </button>
@@ -105,6 +108,31 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                         <button id="register" type="button" class="btn btn-primary">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="keyModal" tabindex="-1" role="dialog" aria-labelledby="keyModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="keyModalLabel">Introducir llave para cifrar mensajes</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1"><i class="fa fa-key"></i></span>
+                            </div>
+                            <input id="keyValue" type="text" class="form-control" placeholder="Llave en bytes" aria-label="Keyvalue" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button id="sendKey" type="button" class="btn btn-primary">Enviar</button>
                     </div>
                 </div>
             </div>

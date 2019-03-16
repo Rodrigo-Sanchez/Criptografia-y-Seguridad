@@ -28,8 +28,6 @@ function RC4(key, str) {
     return res;
 }
 
-console.log(RC4("hola", "AAAAAAAAAAAA"))
-
 /**
  * Función que obtiene un número criptográficamente seguro en el rango [0,1).
  * @returns number 0 o 1 dependiendo si el resultado es mayor/menor que 0.5
@@ -38,5 +36,37 @@ function cryptoRandom() {
     return (window.crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000) > 0.5 ? 1 : 0;
 }
 
-// Vector de Inicialización de 5 bytes para cada mensaje cifrado.
-let IV = Array.from(Array(5), () => cryptoRandom());
+// Decodifica una cadena de datos que ha sido codificada utilizando base-64.
+// atob()
+
+// Crea una cadena ASCII codificada en base 64 a partir de una "cadena" de datos binarios.
+// btob()
+
+console.log(btoa(RC4("hola", "AAAAAAAAAAAA")))
+
+/**
+ * Función para cifrar RC4.
+ * @param {*} key 
+ * @param {*} message 
+ */
+function crypt(key, message) {
+    // Vector de Inicialización de 5 bytes para cada mensaje cifrado.
+    let IV = Array.from(Array(5), () => cryptoRandom());
+
+
+}
+
+/**
+ * Función para descifrar RC4.
+ * @param {*} key 
+ * @param {*} message 
+ */
+function decrypt(key, message) {
+    let IV = [];
+
+    // Obtiene los primeros 5 elementos del IV.
+    key.slice(0, 5).map(i => {
+        IV.push(i);
+    });
+
+}
