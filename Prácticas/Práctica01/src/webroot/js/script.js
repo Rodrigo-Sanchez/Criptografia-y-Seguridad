@@ -1,5 +1,8 @@
 $(document).ready(function () {
 
+    // Asignamos una llave por defecto.
+    window.key = "hola";
+
     // Mostramos el menú cuando cliqueamos en los tres puntos.    
     $('#action_menu_btn').click(function () {
         $('.action_menu').toggle();
@@ -32,11 +35,14 @@ $(document).ready(function () {
             // Agregamos el nombre de usuario destinatario al objeto.
             obj["destino"] = $(this).attr('data-user');
             // Agregamos el mensaje al objeto.
-            obj["msj"] = message;
+            obj["msj"] = atob(message);
+
             // Convierte un objeto a una cadena JSON.
             let json = JSON.stringify(obj);
             // Se envía la cadena al websocket.
             websocket.send(json);
+            // Limpiamos el texto recién enviado del textArea.
+            $("#message").val('');
         }
     });
 
@@ -55,7 +61,7 @@ $(document).ready(function () {
             // Se envía la cadena al websocket.
             websocket.send(json);
             // Ocultamos el modal.
-            $('#exampleModal').modal('hide');
+            $('#usersModal').modal('hide');
         }
     });
 
@@ -117,7 +123,7 @@ $(document).ready(function () {
                             '<img src="webroot/img/man01.svg" class="rounded-circle user_img_msg">' +
                         '</div>' +
                         '<div class="msg_cotainer">' +
-                            obj.msj +
+                        btoa(obj.msj) +
                             '<span class="msg_time">' +
                                 obj.hora +
                             '</span>' +
@@ -201,3 +207,92 @@ function updateScroll() {
 }
 
 setInterval(updateScroll, 100);
+
+
+class RC4 {
+    constructor() {
+        this.key = window.key;
+    }
+
+    /*
+    * Función que implementa el cifrado RC4.
+    * @param string key llave para encriptar/descencriptar.
+    * @param string string cadena a encriptar/descencriptar.
+    * @return string res el resultado de aplicar el método.
+    */
+    get_byte(key, str) {
+        let s = [], j = 0, x, res = '';
+        for (let i = 0; i < 256; i++) {
+            s[i] = i;
+        }
+        for (i = 0; i < 256; i++) {
+            j = (j + s[i] + key.charCodeAt(i % key.length)) % 256;
+            x = s[i];
+            s[i] = s[j];
+            s[j] = x;
+        }
+        i = 0;
+        j = 0;
+        for (let y = 0; y < str.length; y++) {
+            i = (i + 1) % 256;
+            j = (j + s[i]) % 256;
+            x = s[i];
+            s[i] = s[j];
+            s[j] = x;
+            res += String.fromCharCode(str.charCodeAt(y) ^ s[(s[i] + s[j]) % 256]);
+        }
+        return res;
+    }
+
+    /**
+     * Función que obtiene un número criptográficamente seguro en el rango [0,1).
+     * @returns number 0 o 1 dependiendo si el resultado es mayor/menor que 0.5
+     */
+    cryptoRandom() {
+        return (window.crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000) > 0.5 ? 1 : 0;
+    }
+
+    /**
+     * Función para cifrar RC4.
+     * @param {*} key 
+     * @param {*} message 
+     */
+    crypt(key, message) {
+        // Vector de Inicialización de 5 bytes para cada mensaje cifrado.
+        let IV = Array.from(Array(5), () => this.cryptoRandom());
+        let G = RC4(IV.concat(key));
+
+        cypher = new Array(message.length);
+
+        for(let i = 0; i < message.length - 1; i++) {
+            cypher[i] = message[i] && G.get_byte();
+        }
+
+        return IV.concat(cypher);
+    }
+
+    /**
+     * Función para descifrar RC4.
+     * @param {*} key 
+     * @param {*} message 
+     */
+    decrypt(key, cypher) {
+        let IV = [];
+
+        // Obtiene los primeros 5 elementos del IV.
+        cypher.slice(0, 5).map(i => {
+            IV.push(i);
+        });
+
+        cypher.splice(0, 5);
+
+        let G = RC4(IV.concat(key));
+
+        message = new Array(cypher.length);
+        for(let i = 0; i < message.length - 1; i++) {
+            message[i] = cypher[i] && G.get_byte();
+        }
+
+        return message;
+    }
+}
