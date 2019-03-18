@@ -3,6 +3,9 @@ $(document).ready(function () {
     // Asignamos una llave por defecto.
     window.key = "hola";
 
+    let rc4 = new RC4();
+    console.log(rc4.get_byte(window.key, "test"));
+
     // Mostramos el menú cuando cliqueamos en los tres puntos.    
     $('#action_menu_btn').click(function () {
         $('.action_menu').toggle();
@@ -225,13 +228,13 @@ class RC4 {
         for (let i = 0; i < 256; i++) {
             s[i] = i;
         }
-        for (i = 0; i < 256; i++) {
+        for (let i = 0; i < 256; i++) {
             j = (j + s[i] + key.charCodeAt(i % key.length)) % 256;
             x = s[i];
             s[i] = s[j];
             s[j] = x;
         }
-        i = 0;
+        var i = 0;
         j = 0;
         for (let y = 0; y < str.length; y++) {
             i = (i + 1) % 256;
@@ -260,11 +263,12 @@ class RC4 {
     crypt(key, message) {
         // Vector de Inicialización de 5 bytes para cada mensaje cifrado.
         let IV = Array.from(Array(5), () => this.cryptoRandom());
-        let G = RC4(IV.concat(key));
+        let G = new RC4(IV.concat(key));
 
-        cypher = new Array(message.length);
+        let cypher = new Array(message.length);
 
         for(let i = 0; i < message.length - 1; i++) {
+            // Aqui get_byte necesita recibir parámetros
             cypher[i] = message[i] && G.get_byte();
         }
 
