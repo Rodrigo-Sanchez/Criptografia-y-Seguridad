@@ -3,9 +3,6 @@ $(document).ready(function () {
     // Asignamos una llave por defecto.
     window.key = "hola";
 
-    let rc4 = new RC4();
-    console.log(rc4.get_byte(window.key, "test"));
-
     // Mostramos el menú cuando cliqueamos en los tres puntos.    
     $('#action_menu_btn').click(function () {
         $('.action_menu').toggle();
@@ -37,11 +34,18 @@ $(document).ready(function () {
             let obj = {"tipo" : "msj_chat"};
             // Agregamos el nombre de usuario destinatario al objeto.
             obj["destino"] = $(this).attr('data-user');
+
+            let rc4 = new RC4();
+
             // Agregamos el mensaje al objeto.
-            obj["msj"] = atob(message);
+            obj["msj"] = JSON.stringify(rc4.crypt(window.key, message)); //atob(message)
 
             // Convierte un objeto a una cadena JSON.
             let json = JSON.stringify(obj);
+
+            // Muestra en consola cada mensaje enviado.
+            console.log(json);
+
             // Se envía la cadena al websocket.
             websocket.send(json);
             // Limpiamos el texto recién enviado del textArea.
@@ -116,8 +120,13 @@ $(document).ready(function () {
     websocket.onmessage = function (evt) {
         // Convierte en objeto la cadena JSON recibida.
         var obj = JSON.parse(evt.data);
+
         // Imprime cada respuesta del servidor en consola.
         console.log(obj);
+
+        let rc4 = new RC4();
+        console.log(window.key)
+        
         switch (obj.tipo) {
             case "msj_nuevo":
                 $(".msg_card_body").append(
@@ -126,7 +135,7 @@ $(document).ready(function () {
                             '<img src="webroot/img/man01.svg" class="rounded-circle user_img_msg">' +
                         '</div>' +
                         '<div class="msg_cotainer">' +
-                        btoa(obj.msj) +
+                            JSON.stringify(rc4.decrypt('"'+window.key+'"', JSON.parse(obj.msj))).substr(1).slice(0, -1) + // btoa(obj.msj)
                             '<span class="msg_time">' +
                                 obj.hora +
                             '</span>' +
@@ -211,40 +220,38 @@ function updateScroll() {
 
 setInterval(updateScroll, 100);
 
-
 class RC4 {
     constructor() {
         this.key = window.key;
+        this.i = 0;
+        this.j = 0;
     }
 
     /*
-    * Función que implementa el cifrado RC4.
-    * @param string key llave para encriptar/descencriptar.
-    * @param string string cadena a encriptar/descencriptar.
-    * @return string res el resultado de aplicar el método.
+    * Función get_byte.
+    * @return string K el resultado de aplicar el método.
     */
-    get_byte(key, str) {
-        let s = [], j = 0, x, res = '';
-        for (let i = 0; i < 256; i++) {
-            s[i] = i;
+    get_byte(key, message) {
+        let S = [], j = 0, K = '', tmp;
+        for (let i = 0; i <= 255; i++) {
+            S[i] = i;
         }
-        for (let i = 0; i < 256; i++) {
-            j = (j + s[i] + key.charCodeAt(i % key.length)) % 256;
-            x = s[i];
-            s[i] = s[j];
-            s[j] = x;
+        for (let i = 0; i <= 255; i++) {
+            j = (j + S[i] + key.charCodeAt(i % key.length)) % 256;
+            tmp = S[i];
+            S[i] = S[j];
+            S[j] = tmp;
         }
-        var i = 0;
-        j = 0;
-        for (let y = 0; y < str.length; y++) {
-            i = (i + 1) % 256;
-            j = (j + s[i]) % 256;
-            x = s[i];
-            s[i] = s[j];
-            s[j] = x;
-            res += String.fromCharCode(str.charCodeAt(y) ^ s[(s[i] + s[j]) % 256]);
+
+        for (let n = 0, l = message.length; n < l; n++) {
+            this.i = (this.i + 1) % 256;
+            this.j = (this.j + S[this.i]) % 256;
+            tmp = S[this.i];
+            S[this.i] = S[this.j];
+            S[this.j] = tmp;
+            K += String.fromCharCode(message.charCodeAt(n) ^ S[(S[this.i] + S[this.j]) % 256]);
         }
-        return res;
+        return K;
     }
 
     /**
@@ -265,13 +272,9 @@ class RC4 {
         let IV = Array.from(Array(5), () => this.cryptoRandom());
         let G = new RC4(IV.concat(key));
 
-        let cypher = new Array(message.length);
+        let cypher = G.get_byte(G.key, message);
 
-        for(let i = 0; i < message.length - 1; i++) {
-            // Aqui get_byte necesita recibir parámetros
-            cypher[i] = message[i] && G.get_byte();
-        }
-
+        console.log(IV.concat(cypher));
         return IV.concat(cypher);
     }
 
@@ -288,14 +291,14 @@ class RC4 {
             IV.push(i);
         });
 
+
+        let cypherClean = JSON.stringify(cypher.splice(5, 5)).substr(2).slice(0, -2);
+
         cypher.splice(0, 5);
 
-        let G = RC4(IV.concat(key));
+        let G = new RC4(IV.concat(key));
 
-        message = new Array(cypher.length);
-        for(let i = 0; i < message.length - 1; i++) {
-            message[i] = cypher[i] && G.get_byte();
-        }
+        message = G.get_byte(G.key, cypherClean);
 
         return message;
     }
