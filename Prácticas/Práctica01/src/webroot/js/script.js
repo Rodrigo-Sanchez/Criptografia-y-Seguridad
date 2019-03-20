@@ -259,7 +259,8 @@ class RC4 {
      * @returns number 0 o 1 dependiendo si el resultado es mayor/menor que 0.5
      */
     cryptoRandom() {
-        return (window.crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000) > 0.5 ? 1 : 0;
+        return (window.crypto.getRandomValues(new Uint8Array(5))[0]);
+        // return (window.crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000) > 0.5 ? 1 : 0;
     }
 
     /**
@@ -272,7 +273,9 @@ class RC4 {
         let IV = Array.from(Array(5), () => this.cryptoRandom());
         let G = new RC4(IV.concat(key));
 
-        let cypher = G.get_byte(G.key, message);
+        for (let n = 0, l = message.length; n < l; n++) {
+            let cypher = G.get_byte(G.key, message);
+        }
 
         console.log(IV.concat(cypher));
         return IV.concat(cypher);
@@ -302,4 +305,20 @@ class RC4 {
 
         return message;
     }
+
+
 }
+
+var str = "ABCDEabcde";
+var bytes = [];
+var charCode;
+
+for (var i = 0; i < str.length; ++i)
+{
+    charCode = str.charCodeAt(i);
+    console.log(charCode & 0xFF);
+    //bytes.push((charCode & 0xFF00) >> 8);
+    bytes.push(charCode & 0xFF);
+}
+
+alert(bytes.join(' '));
