@@ -38,7 +38,8 @@ $(document).ready(function () {
             let rc4 = new RC4();
 
             // Agregamos el mensaje al objeto.
-            obj["msj"] = JSON.stringify(rc4.crypt(window.key, message)); //atob(message)
+            let messageBytes = rc4.charCode(message);
+            obj["msj"] = JSON.stringify(rc4.crypt(window.key, messageBytes));
 
             // Convierte un objeto a una cadena JSON.
             let json = JSON.stringify(obj);
@@ -125,8 +126,8 @@ $(document).ready(function () {
         console.log(obj);
 
         let rc4 = new RC4();
-        console.log(window.key)
-        
+        console.log(window.key);
+
         switch (obj.tipo) {
             case "msj_nuevo":
                 $(".msg_card_body").append(
@@ -231,26 +232,28 @@ class RC4 {
     * Función get_byte.
     * @return string K el resultado de aplicar el método.
     */
-    get_byte(key, message) {
+    get_byte() {
         let S = [], j = 0, K = '', tmp;
+        
         for (let i = 0; i <= 255; i++) {
             S[i] = i;
         }
+
         for (let i = 0; i <= 255; i++) {
-            j = (j + S[i] + key.charCodeAt(i % key.length)) % 256;
+            j = (j + S[i] + this.key.charCodeAt(i % this.key.length)) % 256;
             tmp = S[i];
             S[i] = S[j];
             S[j] = tmp;
         }
 
-        for (let n = 0, l = message.length; n < l; n++) {
-            this.i = (this.i + 1) % 256;
-            this.j = (this.j + S[this.i]) % 256;
-            tmp = S[this.i];
-            S[this.i] = S[this.j];
-            S[this.j] = tmp;
-            K += String.fromCharCode(message.charCodeAt(n) ^ S[(S[this.i] + S[this.j]) % 256]);
-        }
+        // for (let n = 0, l = message.length; n < l; n++) {
+        this.i = (this.i + 1) % 256;
+        this.j = (this.j + S[this.i]) % 256;
+        tmp = S[this.i];
+        S[this.i] = S[this.j];
+        S[this.j] = tmp;
+        K = S[(S[this.i] + S[this.j]) % 256];
+        // }
         return K;
     }
 
@@ -259,8 +262,7 @@ class RC4 {
      * @returns number 0 o 1 dependiendo si el resultado es mayor/menor que 0.5
      */
     cryptoRandom() {
-        return (window.crypto.getRandomValues(new Uint8Array(5))[0]);
-        // return (window.crypto.getRandomValues(new Uint32Array(1))[0] / 0x100000000) > 0.5 ? 1 : 0;
+        return window.crypto.getRandomValues(new Uint8Array(5))[0];
     }
 
     /**
@@ -271,13 +273,20 @@ class RC4 {
     crypt(key, message) {
         // Vector de Inicialización de 5 bytes para cada mensaje cifrado.
         let IV = Array.from(Array(5), () => this.cryptoRandom());
+        console.log("Antes" + IV);
+        for(let i = 0; i < 5; i++) {
+            IV[i] = IV[i].toString();
+        }
+        console.log("Después" + IV);
+        // console.log(IV.join("-"));
         let G = new RC4(IV.concat(key));
+        let cypher = [];
 
-        for (let n = 0, l = message.length; n < l; n++) {
-            let cypher = G.get_byte(G.key, message);
+        for (let i = 0, l = message.length; i < l; i++) {
+            cypher.push(String.fromCharCode(message.charCodeAt(i) ^ G.get_byte()));
         }
 
-        console.log(IV.concat(cypher));
+        // console.log(IV.concat(cypher));
         return IV.concat(cypher);
     }
 
@@ -294,31 +303,35 @@ class RC4 {
             IV.push(i);
         });
 
-
         let cypherClean = JSON.stringify(cypher.splice(5, 5)).substr(2).slice(0, -2);
 
         cypher.splice(0, 5);
 
         let G = new RC4(IV.concat(key));
 
-        message = G.get_byte(G.key, cypherClean);
+        let message = [];
+
+        for (let i = 0, l = message.length; i < l; i++) {
+            message.push(String.fromCharCode(message.charCodeAt(i) ^ G.get_byte()));
+        }
 
         return message;
     }
 
+    charCode(str) {
+        var bytes = [];
+        var charCode;
+
+        for (var i = 0; i < str.length; ++i)
+        {
+            charCode = str.charCodeAt(i);
+            //bytes.push((charCode & 0xFF00) >> 8);
+            bytes.push(charCode & 0xFF);
+        }
+
+        return bytes;
+        // alert(bytes);
+        // alert(bytes.join(' '));
+    }
 
 }
-
-var str = "ABCDEabcde";
-var bytes = [];
-var charCode;
-
-for (var i = 0; i < str.length; ++i)
-{
-    charCode = str.charCodeAt(i);
-    console.log(charCode & 0xFF);
-    //bytes.push((charCode & 0xFF00) >> 8);
-    bytes.push(charCode & 0xFF);
-}
-
-alert(bytes.join(' '));
